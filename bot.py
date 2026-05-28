@@ -15,8 +15,8 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-BOT_TOKEN = os.environ["BOT_TOKEN"]
-ALLOWED_CHAT_ID = int(os.environ.get("ALLOWED_CHAT_ID", "8215972072"))
+BOT_TOKEN = os.environ["BOT_TOKEN"].strip()
+ALLOWED_CHAT_ID = int(os.environ.get("ALLOWED_CHAT_ID", "8215972072").strip())
 API = f"https://api.telegram.org/bot{BOT_TOKEN}"
 STATE = Path(__file__).parent / "state.json"
 TG_LIMIT = 4000  # leave headroom under 4096
@@ -142,10 +142,11 @@ def handle_update(upd, data_cache):
     if not msg: return
     chat = msg.get("chat", {})
     chat_id = chat.get("id")
-    if chat_id != ALLOWED_CHAT_ID:
-        print(f"reject chat_id={chat_id}", file=sys.stderr)
-        return
     text = (msg.get("text") or "").strip()
+    print(f"update from chat_id={chat_id} (allowed={ALLOWED_CHAT_ID}) text={text!r}")
+    if chat_id != ALLOWED_CHAT_ID:
+        print(f"REJECT chat_id={chat_id} != allowed={ALLOWED_CHAT_ID}")
+        return
     if not text: return
 
     if text in ("/start", "/help"):
