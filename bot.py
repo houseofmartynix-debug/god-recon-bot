@@ -37,9 +37,16 @@ def tg(method, **params):
     req = urllib.request.Request(f"{API}/{method}", data=data)
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            return json.loads(r.read())
+            body = r.read()
+            resp = json.loads(body)
+            if not resp.get("ok"):
+                print(f"TG NOT OK {method}: {body[:300]!r}")
+            return resp
+    except urllib.error.HTTPError as e:
+        print(f"TG HTTPError {method} {e.code}: {e.read()[:300]!r}")
+        return None
     except Exception as e:
-        print(f"tg error {method}: {e}", file=sys.stderr)
+        print(f"TG EXC {method}: {e}")
         return None
 
 def send(chat_id, text):
