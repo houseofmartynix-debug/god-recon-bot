@@ -172,11 +172,15 @@ def handle_update(upd, data_cache):
         send(chat_id, "Usage: /target <name>")
         return
 
+    print(f">> query={query!r}", flush=True)
     if data_cache[0] is None:
         send(chat_id, f"⏳ fetching scope data for `{query}` ...")
+        print(">> fetching all bounty data...", flush=True)
         data_cache[0] = fetch_all()
+        print(f">> fetched: " + ", ".join(f"{k}={len(v)}" for k,v in data_cache[0].items()), flush=True)
 
     hits = search(data_cache[0], query)
+    print(f">> {len(hits)} hits", flush=True)
     if not hits:
         send(chat_id, f"❌ no match for `{query}` across H1 / Bugcrowd / YesWeHack")
         return
@@ -186,6 +190,7 @@ def handle_update(upd, data_cache):
         hits = hits[:5]
 
     for plat, p in hits:
+        print(f">> sending {plat}/{p.get('handle') or p.get('slug') or p.get('name')}", flush=True)
         send(chat_id, fmt_program(plat, p))
 
 def main():

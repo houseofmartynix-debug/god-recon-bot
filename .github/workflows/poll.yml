@@ -27,7 +27,8 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           ALLOWED_CHAT_ID: ${{ secrets.ALLOWED_CHAT_ID }}
-        run: python bot.py
+          PYTHONUNBUFFERED: "1"
+        run: python -u bot.py
 
       - name: Commit state
         run: |
